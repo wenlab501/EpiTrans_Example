@@ -169,8 +169,8 @@ create.basemap <- function(b){
 }
 
 
-create.pts_sf <- function(x1, x2,crs_pts=NULL, base_map=NULL){
-  pts<-lapply(1:length(x1),function(i) st_point(c(x1[i],x2[i])))
+create.pts_sf <- function(x, y,crs_pts=NULL, base_map=NULL){
+  pts<-lapply(1:length(x),function(i) st_point(c(x[i],y[i])))
   if(is.null(crs_pts) & !is.null(base_map)) crs_pts <- st_crs(base_map)
   if(is.null(crs_pts))  crs_pts <- 4326
   st_sf( geometry=st_sfc(pts),crs = crs_pts)
@@ -190,9 +190,9 @@ get.qRj <- function(Rj, qn=10){
   qRj
 }
 
-plot.kde <-  function(x1, x2, ngrid=100,  crs_pts=NULL, bnd=NULL, base_map=NULL){
+plot.kde <-  function(x, y, ngrid=100,  crs_pts=NULL, bnd=NULL, base_map=NULL){
   
-  pts <- create.pts_sf(x1, x2, crs_pts, base_map )
+  pts <- create.pts_sf(x, y, crs_pts, base_map )
   if(is.null(bnd)) bnd <- st_bbox(pts)
   bnd <- rescale.bnd(bnd)
   
@@ -220,10 +220,10 @@ plot.kde <-  function(x1, x2, ngrid=100,  crs_pts=NULL, bnd=NULL, base_map=NULL)
   
 }
 
-plot.hex <- function(x1, x2, Rj=NULL, nbin=30,
+plot.hex <- function(x, y, Rj=NULL, nbin=30,
                      crs_pts=NULL, bnd=NULL,  base_map=NULL){
   
-  pts <- create.pts_sf(x1, x2, crs_pts, base_map )
+  pts <- create.pts_sf(x, y, crs_pts, base_map )
   pts <- cbind(pts, st_coordinates(pts$geometry) )
   if(is.null(bnd)) bnd <- st_bbox(pts)
   bnd <- rescale.bnd(bnd)
@@ -234,7 +234,7 @@ plot.hex <- function(x1, x2, Rj=NULL, nbin=30,
     f.agg <- mean
     colset <- "YlGnBu"
   }else{ 
-    z <- rep(1, length(x1))
+    z <- rep(1, length(x))
     zlab <- "Counts"
     f.agg <- sum
     colset <- "YlOrRd"
@@ -271,10 +271,10 @@ plot.hex <- function(x1, x2, Rj=NULL, nbin=30,
   
 }
 
-plot.points <- function(x1, x2, Rj=NULL, 
+plot.points <- function(x, y, Rj=NULL, 
                         crs_pts=NULL, bnd=NULL,  base_map=NULL){
   
-  pts <- create.pts_sf(x1, x2, crs_pts, base_map )
+  pts <- create.pts_sf(x, y, crs_pts, base_map )
   if(is.null(bnd)) bnd <- st_bbox(pts)
   bnd <- rescale.bnd(bnd)
   
@@ -318,18 +318,18 @@ plot.points <- function(x1, x2, Rj=NULL,
 }
 
 
-animate.points <- function(t, x1, x2, Rj, dt, crs_pts=NULL, bnd=NULL,  base_map=NULL){
+animate.points <- function(t, x, y, Rj, dt, crs_pts=NULL, bnd=NULL,  base_map=NULL){
   
   # t <- df$date
-  # x1<-df$long
-  # x2<-df$lat
+  # x<-df$long
+  # y<-df$lat
   # Rj <-NULL
   # dt<-15
   # crs_pts=NULL
   # base_map = base_tn 
   # bnd = c(120.1,22.9,120.4,23.1)
   
-  pts <-create.pts_sf(x1, x2, base_map = base_map )
+  pts <-create.pts_sf(x, y, base_map = base_map )
   pts$t <- t
   pts$tg <- cut(t, breaks =  seq(min(t),max(t)+dt,dt),right = F)
   
@@ -384,12 +384,12 @@ animate.points <- function(t, x1, x2, Rj, dt, crs_pts=NULL, bnd=NULL,  base_map=
 }
 
 
-animate.hex <- function(t, x1, x2, Rj, dt, nbin=30, 
+animate.hex <- function(t, x, y, Rj, dt, nbin=30, 
                         crs_pts=NULL, bnd=NULL,  base_map=NULL){
   
   # t <- df$date
-  # x1<-df$long
-  # x2<-df$lat
+  # x<-df$long
+  # y<-df$lat
   # Rj <-df$Rj_adj
   # dt<-7
   # crs_pts=NULL
@@ -397,7 +397,7 @@ animate.hex <- function(t, x1, x2, Rj, dt, nbin=30,
   # nbin=30
   # bnd = c(120.1,22.9,120.4,23.1)
   
-  pts <- create.pts_sf(x1, x2, crs_pts, base_map )
+  pts <- create.pts_sf(x, y, crs_pts, base_map )
   pts <- cbind(pts,t , st_coordinates(pts$geometry) )
   pts$tg <- cut(t, breaks =  seq(min(t),max(t)+dt,dt),right = F)
   
@@ -408,7 +408,7 @@ animate.hex <- function(t, x1, x2, Rj, dt, nbin=30,
     f.agg <- mean
     colset <- "YlGnBu"
   }else{ 
-    z <- rep(1, length(x1))
+    z <- rep(1, length(x))
     zlab <- "Counts"
     f.agg <- sum
     colset <- "OrRd"
